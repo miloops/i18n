@@ -190,9 +190,9 @@ module I18n
     # Merges the given locale, key and scope into a single array of keys.
     # Splits keys that contain dots into multiple keys. Makes sure all
     # keys are Symbols.
-    def normalize_translation_keys(locale, key, scope)
+    def normalize_translation_keys(locale, key, scope, separator = '.')
       keys = [locale] + Array(scope) + [key]
-      keys = keys.map { |k| k.to_s.split(/\./) }
+      keys = keys.map { |k| k.to_s.split(separator || '.') }
       keys.flatten.map { |k| k.to_sym }
     end
   end

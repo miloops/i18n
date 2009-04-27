@@ -25,12 +25,12 @@ module I18n
         raise InvalidLocale.new(locale) if locale.nil?
         return key.map { |k| translate(locale, k, options) } if key.is_a? Array
 
-        reserved = :scope, :default
-        count, scope, default = options.values_at(:count, *reserved)
+        reserved = :scope, :default, :separator
+        count, scope, default, separator = options.values_at(:count, *reserved)
         options.delete(:default)
         values = options.reject { |name, value| reserved.include?(name) }
 
-        entry = lookup(locale, key, scope)
+        entry = lookup(locale, key, scope, separator)
         if entry.nil?
           entry = default(locale, default, options)
           if entry.nil?
@@ -95,10 +95,10 @@ module I18n
         # nested translations hash. Splits keys or scopes containing dots
         # into multiple keys, i.e. <tt>currency.format</tt> is regarded the same as
         # <tt>%w(currency format)</tt>.
-        def lookup(locale, key, scope = [])
+        def lookup(locale, key, scope = [], separator = '.')
           return unless key
           init_translations unless initialized?
-          keys = I18n.send(:normalize_translation_keys, locale, key, scope)
+          keys = I18n.send(:normalize_translation_keys, locale, key, scope, separator)
           keys.inject(translations) do |result, k|
             if (x = result[k.to_sym]).nil?
               return nil
@@ -117,7 +117,7 @@ module I18n
         # <tt>translate(locale, :foo)</tt> does not yield a result.
         def default(locale, default, options = {})
           case default
-            when String then default
+            when String, Hash then default
             when Symbol then translate locale, default, options
             when Array  then default.each do |obj|
               result = default(locale, obj, options.dup) and return result

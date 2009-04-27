@@ -138,7 +138,7 @@ class I18nSimpleBackendTranslateTest < Test::Unit::TestCase
   include I18nSimpleBackendTestSetup
 
   def test_translate_calls_lookup_with_locale_given
-    @backend.expects(:lookup).with('de', :bar, [:foo]).returns 'bar'
+    @backend.expects(:lookup).with('de', :bar, [:foo], nil).returns 'bar'
     @backend.translate 'de', :bar, :scope => [:foo]
   end
 
@@ -208,38 +208,34 @@ class I18nSimpleBackendPluralizeTest < Test::Unit::TestCase
     entry = {:one => 'bar', :other => 'bars'}
     assert_equal entry, @backend.send(:pluralize, nil, entry, nil)
   end
-
+  
   def test_pluralize_given_0_returns_zero_string_if_zero_key_given
     assert_equal 'zero', @backend.send(:pluralize, nil, {:zero => 'zero', :one => 'bar', :other => 'bars'}, 0)
   end
-
+  
   def test_pluralize_given_0_returns_plural_string_if_no_zero_key_given
     assert_equal 'bars', @backend.send(:pluralize, nil, {:one => 'bar', :other => 'bars'}, 0)
   end
-
+  
   def test_pluralize_given_1_returns_singular_string
     assert_equal 'bar', @backend.send(:pluralize, nil, {:one => 'bar', :other => 'bars'}, 1)
   end
-
+  
   def test_pluralize_given_2_returns_plural_string
     assert_equal 'bars', @backend.send(:pluralize, nil, {:one => 'bar', :other => 'bars'}, 2)
   end
-
+  
   def test_pluralize_given_3_returns_plural_string
     assert_equal 'bars', @backend.send(:pluralize, nil, {:one => 'bar', :other => 'bars'}, 3)
   end
-
+  
   def test_interpolate_given_incomplete_pluralization_data_raises_invalid_pluralization_data
     assert_raises(I18n::InvalidPluralizationData){ @backend.send(:pluralize, nil, {:one => 'bar'}, 2) }
   end
 
-  # def test_interpolate_given_a_string_raises_invalid_pluralization_data
-  #   assert_raises(I18n::InvalidPluralizationData){ @backend.send(:pluralize, nil, 'bar', 2) }
-  # end
-  #
-  # def test_interpolate_given_an_array_raises_invalid_pluralization_data
-  #   assert_raises(I18n::InvalidPluralizationData){ @backend.send(:pluralize, nil, ['bar'], 2) }
-  # end
+  def test_pluralize_given_pluralization_data_as_default
+    assert_equal 'bars', I18n.t(:bar, :count => 2, :default => { :one => 'bar', :other => 'bars' })
+  end
 end
 
 class I18nSimpleBackendInterpolateTest < Test::Unit::TestCase
@@ -298,9 +294,9 @@ class I18nSimpleBackendInterpolateTest < Test::Unit::TestCase
   def test_interpolate_given_a_string_containing_a_reserved_key_raises_reserved_interpolation_key
     assert_raises(I18n::ReservedInterpolationKey) { @backend.send(:interpolate, nil, '{{default}}', {:default => nil}) }
   end
-  
+
   private
-  
+
   def euc_jp(string)
     string.encode!(Encoding::EUC_JP)
   end
@@ -540,27 +536,27 @@ end
 
 class I18nSimpleBackendReloadTranslationsTest < Test::Unit::TestCase
   include I18nSimpleBackendTestSetup
-  
+
   def setup
     @backend = I18n::Backend::Simple.new
     I18n.load_path = [File.dirname(__FILE__) + '/locale/en.yml']
     assert_nil backend_get_translations
     @backend.send :init_translations
   end
-  
+
   def teardown
     I18n.load_path = []
   end
-  
+
   def test_setup
     assert_not_nil backend_get_translations
   end
-  
+
   def test_reload_translations_unloads_translations
     @backend.reload!
     assert_nil backend_get_translations
   end
-  
+
   def test_reload_translations_uninitializes_translations
     @backend.reload!
     assert_equal @backend.initialized?, false
