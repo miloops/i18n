@@ -205,7 +205,7 @@ module I18n
         def deep_symbolize_keys(hash)
           hash.inject({}) { |result, (key, value)|
             value = deep_symbolize_keys(value) if value.is_a? Hash
-            result[(key.to_sym rescue key) || key] = value
+            result[key == '' ? key : key.to_sym] = value
             result
           }
         end

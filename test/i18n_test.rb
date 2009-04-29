@@ -1,10 +1,4 @@
-$:.unshift "lib"
-
-require 'rubygems'
-require 'test/unit'
-require 'mocha'
-require 'i18n'
-require 'active_support'
+require File.expand_path(File.dirname(__FILE__) + '/test_helper')
 
 class I18nTest < Test::Unit::TestCase
   def setup

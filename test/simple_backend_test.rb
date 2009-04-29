@@ -1,12 +1,5 @@
 # encoding: utf-8
-$:.unshift "lib"
-
-require 'rubygems'
-require 'test/unit'
-require 'mocha'
-require 'i18n'
-require 'time'
-require 'yaml'
+require File.expand_path(File.dirname(__FILE__) + '/test_helper')
 
 module I18nSimpleBackendTestSetup
   def setup_backend

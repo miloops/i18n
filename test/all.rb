@@ -2,4 +2,6 @@ dir = File.dirname(__FILE__)
 require dir + '/i18n_test.rb'
 require dir + '/simple_backend_test.rb'
 require dir + '/i18n_exceptions_test.rb'
-require dir + '/gettext_test.rb'
+
+require dir + '/gettext/api_test.rb'
+require dir + '/gettext/backend_test.rb'
